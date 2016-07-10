@@ -2,17 +2,45 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="16dp"
+    android:background="@color/colorImageBackground"
+    android:minHeight="@dimen/list_item_height"
     xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical">
+    android:orientation="horizontal">
 
-    <TextView
-        android:id="@+id/numberList_txt1"
-        style="@style/numberLisStyle"
-        tools:text="lutti"/>
 
-    <TextView
-        android:id="@+id/numberList_txt2"
-        style="@style/numberLisStyle"
-        tools:text="one"/>
+    <ImageView
+        android:id="@+id/image"
+        style="@style/itemListImage"
+        android:src="@mipmap/ic_launcher" />
+
+    <LinearLayout
+        android:id="@+id/textContainer"
+        android:layout_width="match_parent"
+        android:layout_height="88dp"
+        android:orientation="vertical"
+        android:paddingLeft="16dp">
+
+        <TextView
+            android:id="@+id/numberList_txt1"
+            style="@style/itemListStyle"
+            tools:text="lutti"
+            android:textStyle="bold"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:gravity="bottom"
+            android:textAppearance="?android:textAppearanceMedium"/>
+
+        <TextView
+            android:id="@+id/numberList_txt2"
+            style="@style/itemListStyle"
+            tools:text="one"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:gravity="top"
+            android:textAppearance="?android:textAppearanceMedium"/>
+
+    </LinearLayout>
+
 </LinearLayout>

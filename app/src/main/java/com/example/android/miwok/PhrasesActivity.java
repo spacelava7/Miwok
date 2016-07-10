@@ -42,7 +42,7 @@ public class PhrasesActivity extends AppCompatActivity {
 
         LinearLayout numbersView = (LinearLayout) findViewById(R.id.phrasesView);
         //Adds items to the listView
-        WordAdapter wordItemAdapter = new WordAdapter (this, words);
+        WordAdapter wordItemAdapter = new WordAdapter (this, words, R.color.category_phrases);
 
         ListView listView = (ListView) findViewById(R.id.phraseList);
         listView.setAdapter(wordItemAdapter);
