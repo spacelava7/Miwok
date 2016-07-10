@@ -46,9 +46,12 @@ public class NumbersActivity extends AppCompatActivity {
 
         LinearLayout numbersView = (LinearLayout) findViewById(R.id.numbersView);
         //Adds items to the listView
-        ArrayAdapter<String> itemsAdapter = new ArrayAdapter<String>(this, R.layout.number_list_layout, words);
+
+        //ArrayAdapter<Word> itemsAdapter = new ArrayAdapter<Word>(this, R.layout.number_list_layout, words);
+        WordAdapter wordItemAdapter = new WordAdapter (this, words);
+
         ListView listView = (ListView) findViewById(R.id.numberList);
-        listView.setAdapter(itemsAdapter);
+        listView.setAdapter(wordItemAdapter);
 
     }
 
