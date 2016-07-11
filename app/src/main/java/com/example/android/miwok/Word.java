@@ -9,14 +9,25 @@ public class Word {
 
     private String mMiwokTranslation;
     private String mDefaultTranslation;
+
     /** Image resource ID for the word */
     private int mImageResourceId = NO_IMAGE_PROVIDED;
-
     final static int NO_IMAGE_PROVIDED = -1; //represents img was not provided
 
-    public Word(String defaultTranslation, String miwoktranslation){
+    private int mAudioResourceId;
+
+
+    /**
+     * Constructor for Array List with only miwok word, english word and audio file
+     *  example: Phrases Activity
+     * @param defaultTranslation
+     * @param miwoktranslation
+     * @param audioResource
+     */
+    public Word(String defaultTranslation, String miwoktranslation, int audioResource){
         mMiwokTranslation = miwoktranslation;
         mDefaultTranslation = defaultTranslation;
+        mAudioResourceId = audioResource;
     }
 
 
@@ -33,17 +44,23 @@ public class Word {
         return mMiwokTranslation;
     }
 
-    public Word(String miwoktranslation, String defaultTranslation, int resourceId){
-        mMiwokTranslation = miwoktranslation;
-        mDefaultTranslation = defaultTranslation;
-        mImageResourceId  =resourceId;
-    }
-
     public int getImageResourceId(){
         return mImageResourceId;
     }
 
     public boolean hasImage(){
         return mImageResourceId != NO_IMAGE_PROVIDED;
+    }
+
+    public int getAudioResourceId(){
+        return mAudioResourceId;
+    }
+
+    public Word(String defaultTranslation, String miwoktranslation, int resourceId,
+                int audioResource){
+        mMiwokTranslation = miwoktranslation;
+        mDefaultTranslation = defaultTranslation;
+        mImageResourceId  = resourceId;
+        mAudioResourceId = audioResource;
     }
 }

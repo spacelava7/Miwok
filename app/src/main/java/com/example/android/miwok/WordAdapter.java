@@ -67,8 +67,6 @@ public class WordAdapter extends ArrayAdapter<Word> {
         defaultText.setText(currentWord.getDefaultTranslation());
 
         ImageView imageView = (ImageView) listItemView.findViewById(R.id.image);
-
-
         if (currentWord.hasImage()){
             imageView.setImageResource(currentWord.getImageResourceId());
             imageView.setVisibility(View.VISIBLE);
@@ -80,7 +78,6 @@ public class WordAdapter extends ArrayAdapter<Word> {
         int color = ContextCompat.getColor(getContext(), mColorResourceId);
         // Set the background color of the text container View
         textContainer.setBackgroundColor(color);
-
 
         return  listItemView;
     }
