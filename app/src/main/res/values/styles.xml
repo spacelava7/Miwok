@@ -41,4 +41,5 @@
         <item name="android:layout_height">@dimen/list_item_height</item>
         <item name="android:layout_width">@dimen/list_item_height</item>
     </style>
+
 </resources>
