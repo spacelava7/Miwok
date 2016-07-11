@@ -15,6 +15,8 @@
  */
 package com.example.android.miwok;
 
+import android.content.Context;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -29,10 +31,31 @@ public class ColorsActivity extends AppCompatActivity {
 
     private MediaPlayer mMediaPlayer;
 
+    private AudioManager mAudioManager; //manages audio focus
+    private AudioManager.OnAudioFocusChangeListener mOnAudioFocusChangeListener =
+            new AudioManager.OnAudioFocusChangeListener() {
+                @Override
+                public void onAudioFocusChange(int focusChange){
+                    if(focusChange == AudioManager.AUDIOFOCUS_GAIN_TRANSIENT ||
+                            focusChange == AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_MAY_DUCK){
+                        //audio is lost for a short period
+                        mMediaPlayer.pause();
+                        mMediaPlayer.seekTo(0);
+                    } else if (focusChange == AudioManager.AUDIOFOCUS_GAIN){
+                        //audio resumes playback
+                        mMediaPlayer.start();
+                    } else {
+                        // audio is permanently lost
+                        releaseMediaPlayer();
+                    }
+                }
+            };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_colors);
+        mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
 
         final ArrayList<Word> words = new ArrayList<Word>();
         words.add(new Word("red","weṭeṭṭi", R.drawable.color_red, R.raw.color_red));
@@ -50,14 +73,30 @@ public class ColorsActivity extends AppCompatActivity {
 
         ListView listView = (ListView) findViewById(R.id.colorList);
         listView.setAdapter(wordItemAdapter);
+
+        //Gets position of Item selected
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
                 Word word = words.get(position);
-                mMediaPlayer = MediaPlayer.create(ColorsActivity.this, word.getAudioResourceId());
-                mMediaPlayer.start();
+
+                // request audio focus to play audio.
+                int result = mAudioManager.requestAudioFocus(mOnAudioFocusChangeListener, AudioManager.STREAM_MUSIC,
+                        AudioManager.AUDIOFOCUS_GAIN_TRANSIENT);
+
+                if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED){
+                    //audio has been given
+                    mMediaPlayer = MediaPlayer.create(ColorsActivity.this, word.getAudioResourceId());
+                    mMediaPlayer.start();
+                    mMediaPlayer.setOnCompletionListener(mCompletionListener);
+                }
+
             }
         });
+        // setting the media player to null is an easy way to tell that the media player it has no file
+        mMediaPlayer = null;
+        // regarless of audio focus being granted or not, abandon it. Also unregisters audio focus
+        mAudioManager.abandonAudioFocus(mOnAudioFocusChangeListener);
     }
 
     @Override
@@ -65,6 +104,18 @@ public class ColorsActivity extends AppCompatActivity {
         super.onStop();
         releaseMediaPlayer();
     }
+
+    /**
+     +     * This listener gets triggered when the {@link MediaPlayer} has completed
+     +     * playing the audio file.
+     +     */
+    private MediaPlayer.OnCompletionListener mCompletionListener = new MediaPlayer.OnCompletionListener() {
+        @Override
+        public void onCompletion(MediaPlayer mediaPlayer) {
+            // Now that the sound file has finished playing, release the media player resources.
+            releaseMediaPlayer();
+        }
+    };
 
     /**
      * Clean up the media player by releasing its resources.

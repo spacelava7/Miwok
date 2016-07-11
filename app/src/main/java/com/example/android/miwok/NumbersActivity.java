@@ -15,6 +15,8 @@
  */
 package com.example.android.miwok;
 
+import android.content.Context;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -30,11 +32,31 @@ import java.util.ArrayList;
 public class NumbersActivity extends AppCompatActivity {
 
     private MediaPlayer mMediaPlayer;
+    private AudioManager mAudioManager; //manages audio focus
+    private AudioManager.OnAudioFocusChangeListener mOnAudioFocusChangeListener =
+            new AudioManager.OnAudioFocusChangeListener() {
+        @Override
+        public void onAudioFocusChange(int focusChange){
+            if(focusChange == AudioManager.AUDIOFOCUS_GAIN_TRANSIENT ||
+                    focusChange == AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_MAY_DUCK){
+                //audio is lost for a short period
+                mMediaPlayer.pause();
+                mMediaPlayer.seekTo(0);
+            } else if (focusChange == AudioManager.AUDIOFOCUS_GAIN){
+                //audio resumes playback
+                mMediaPlayer.start();
+            } else {
+                // audio is permanently lost
+                releaseMediaPlayer();
+            }
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_numbers);
+        mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
 
         // Array list is set as final because its content will not change
         final ArrayList<Word> words = new ArrayList<Word>();
@@ -62,10 +84,24 @@ public class NumbersActivity extends AppCompatActivity {
             @Override
               public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
                 Word word = words.get(position);
-                mMediaPlayer = MediaPlayer.create(NumbersActivity.this, word.getAudioResourceId());
-                mMediaPlayer.start();
+
+                // request audio focus to play audio.
+                int result = mAudioManager.requestAudioFocus(mOnAudioFocusChangeListener, AudioManager.STREAM_MUSIC,
+                        AudioManager.AUDIOFOCUS_GAIN_TRANSIENT);
+
+                if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED){
+                    //audio has been given
+                    mMediaPlayer = MediaPlayer.create(NumbersActivity.this, word.getAudioResourceId());
+                    mMediaPlayer.start();
+                    mMediaPlayer.setOnCompletionListener(mCompletionListener);
+                }
+
             }
         });
+        // setting the media player to null is an easy way to tell that the media player it has no file
+        mMediaPlayer = null;
+        // regarless of audio focus being granted or not, abandon it. Also unregisters audio focus
+        mAudioManager.abandonAudioFocus(mOnAudioFocusChangeListener);
     }
 
     /**
@@ -102,6 +138,8 @@ public class NumbersActivity extends AppCompatActivity {
             mMediaPlayer = null;
         }
     }
+
+
 
 
 }
